@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octp.dev/schema/v0.1/envelope.json",
+  "title": "OCTP Trust Envelope",
+  "description": "Open Contribution Trust Protocol v0.1 envelope schema",
+  "type": "object",
+  "required": [
+    "octp_version",
+    "contribution_id", 
+    "timestamp",
+    "repository",
+    "commit_hash",
+    "provenance",
+    "verification",
+    "integrity"
+  ],
+  "properties": {
+    "octp_version": {
+      "type": "string",
+      "const": "0.1",
+      "description": "OCTP spec version used to generate this envelope"
+    },
+    "contribution_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID v4 uniquely identifying this envelope"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp of envelope generation"
+    },
+    "repository": {
+      "type": "string",
+      "description": "Target repository in platform/org/repo format"
+    },
+    "commit_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the commit this envelope describes"
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["method", "human_review_level", "developer_id"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "human_only",
+            "ai_assisted_human_reviewed",
+            "ai_generated_human_reviewed",
+            "ai_generated_unreviewed"
+          ]
+        },
+        "ai_tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["model", "vendor", "version", "usage_type"],
+            "properties": {
+              "model": { "type": "string" },
+              "vendor": { "type": "string" },
+              "version": { "type": "string" },
+              "usage_type": { "type": "string" }
+            }
+          }
+        },
+        "human_review_level": {
+          "type": "string",
+          "enum": [
+            "none",
+            "glance",
+            "moderate_review",
+            "substantial_modification",
+            "complete_rewrite"
+          ]
+        },
+        "human_review_duration_minutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "developer_id": {
+          "type": "string",
+          "description": "Contributor identity — GitHub handle or DID"
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "tests_passed",
+        "static_analysis",
+        "dependency_check",
+        "novel_dependencies_introduced"
+      ],
+      "properties": {
+        "tests_passed": { "type": "boolean" },
+        "test_suite_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32,64}$"
+        },
+        "static_analysis": {
+          "type": "string",
+          "enum": ["passed", "failed", "skipped"]
+        },
+        "static_analysis_tool": { "type": "string" },
+        "dependency_check": {
+          "type": "string",
+          "enum": ["passed", "failed", "skipped"]
+        },
+        "novel_dependencies_introduced": { "type": "boolean" }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "required": [
+        "payload_hash",
+        "developer_signature",
+        "signature_algorithm",
+        "signed_at"
+      ],
+      "properties": {
+        "payload_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "developer_signature": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature over payload_hash"
+        },
+        "signature_algorithm": {
+          "type": "string",
+          "const": "ES256"
+        },
+        "signed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "optional_context": {
+      "type": "object",
+      "properties": {
+        "issue_reference": { "type": "string" },
+        "self_assessed_confidence": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "areas_of_uncertainty": { "type": "string" },
+        "time_in_codebase_minutes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
