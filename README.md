@@ -24,7 +24,7 @@ v0.1 — Community Draft. Open for review and discussion.
 
 ## The Problem This Solves
 
-→ [Read the founding essay](https://your-essay-url-here)
+→ [Read the founding essay](https://medium.com/p/34bfc93f79ce)
 ```
 
 Commit directly to main. Message: `Initial README`.
